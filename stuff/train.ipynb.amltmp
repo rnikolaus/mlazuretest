@@ -1,0 +1,374 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "source": [
+        "import azureml.core\n",
+        "\n",
+        "print(\"Azure Machine Learning SDK Version:\", azureml.core.VERSION)"
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "Azure Machine Learning SDK Version: 1.37.0\n"
+        }
+      ],
+      "execution_count": 1,
+      "metadata": {
+        "gather": {
+          "logged": 1647457740686
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from azureml.core import Workspace\n",
+        "\n",
+        "ws = Workspace.from_config()\n",
+        "print(ws.name, ws.location, ws.resource_group, sep = ' | ')"
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "ml-workspace | eastus | ml-rg\n"
+        }
+      ],
+      "execution_count": 2,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1647457740872
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from azureml.core.compute import AmlCompute, ComputeTarget\n",
+        "import os\n",
+        "\n",
+        "# Choose a name and maximum size for your cluster\n",
+        "compute_name = \"cpu-cluster-d2\"\n",
+        "compute_min_nodes = 0\n",
+        "compute_max_nodes = 4\n",
+        "vm_size = \"STANDARD_D2_V2\"\n",
+        "\n",
+        "if compute_name in ws.compute_targets:\n",
+        "    print(\"Found an existing compute target of name: \" + compute_name)\n",
+        "    compute_target = ws.compute_targets[compute_name]\n",
+        "    # Note: you may want to make sure compute_target is of type AmlCompute        \n",
+        "else:\n",
+        "    print(\"Creating new compute target...\")\n",
+        "    provisioning_config = AmlCompute.provisioning_configuration(\n",
+        "        vm_size=vm_size,\n",
+        "        min_nodes=compute_min_nodes, \n",
+        "        max_nodes=compute_max_nodes)\n",
+        "        \n",
+        "    # Create the cluster\n",
+        "    compute_target = ComputeTarget.create(ws, compute_name, provisioning_config)\n",
+        "    compute_target.wait_for_completion(show_output=True, min_node_count=None, timeout_in_minutes=20)\n",
+        "\n",
+        "print(compute_target.get_status().serialize())"
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "Found an existing compute target of name: cpu-cluster-d2\n{'currentNodeCount': 1, 'targetNodeCount': 1, 'nodeStateCounts': {'preparingNodeCount': 0, 'runningNodeCount': 0, 'idleNodeCount': 1, 'unusableNodeCount': 0, 'leavingNodeCount': 0, 'preemptedNodeCount': 0}, 'allocationState': 'Steady', 'allocationStateTransitionTime': '2022-03-16T18:19:20.375000+00:00', 'errors': None, 'creationTime': '2022-01-15T14:45:39.283011+00:00', 'modifiedTime': '2022-01-15T14:45:42.951037+00:00', 'provisioningState': 'Succeeded', 'provisioningStateTransitionTime': None, 'scaleSettings': {'minNodeCount': 0, 'maxNodeCount': 4, 'nodeIdleTimeBeforeScaleDown': 'PT1800S'}, 'vmPriority': 'Dedicated', 'vmSize': 'STANDARD_D2_V2'}\n"
+        }
+      ],
+      "execution_count": 3,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1647457742126
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from azureml.core.experiment import Experiment\n",
+        "\n",
+        "from files import BCTrade_utils\n",
+        "#env ='Btc_with_indicators'\n",
+        "env ='Bitstamp_1'\n",
+        "experiment_name = BCTrade_utils.registerBCTrade(env)\n",
+        "exp = Experiment(workspace=ws, name=experiment_name)"
+      ],
+      "outputs": [],
+      "execution_count": 4,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1647457749119
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from \tazureml.data.data_reference import DataReference\n",
+        "from azureml.core import Dataset\n",
+        "\n",
+        "datastore = ws.get_default_datastore()\n",
+        "\n",
+        "path='checkpoints_'\n",
+        "path+='BCTrade-Bitstamp_1_1647207822_d3913bb9_head'\n",
+        "checkpoint_ds= Dataset.File.from_files(DataReference(datastore, path_on_datastore=path))\n",
+        "\n",
+        "checkpoint = '-838'\n"
+      ],
+      "outputs": [],
+      "execution_count": 5,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1647457754300
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from azureml.contrib.train.rl import ReinforcementLearningEstimator, Ray\n",
+        "from azureml.core.environment import Environment\n",
+        "\n",
+        "training_algorithm = \"PPO\"\n",
+        "rl_environment = env\n",
+        "video_capture = False\n",
+        "\n",
+        "algorithm_config = '\\'{\"num_gpus\": 0, \"num_workers\": 1}\\''\n",
+        "#if video_capture:\n",
+        "#    algorithm_config = '\\'{\"num_gpus\": 0, \"num_workers\": 1, \"monitor\": true}\\''\n",
+        "#else:\n",
+        "#    algorithm_config = '\\'{\"num_gpus\": 0, \"num_workers\": 1, \"monitor\": false}\\''\n",
+        "script_params = {\n",
+        "\n",
+        "    # Training algorithm\n",
+        "    \"--run\": training_algorithm,\n",
+        "    \n",
+        "    # Training environment\n",
+        "    \"--env\": '\\'{\"name\": \"'+rl_environment+'\", \"singlerun\": False, \"spreadfactor\":0.0}\\'',\n",
+        "    #\"--env\": '\\'{\"name\": \"'+rl_environment+'\", \"checkpoint\":\"'+checkpoint+'\", \"singlerun\":False, \"spreadfactor\":0.0}\\'',\n",
+        "\n",
+        "    #\"--spreadfactor\": 0.1,\n",
+        "    \n",
+        "    # Algorithm-specific parameters\n",
+        "    \"--config\": algorithm_config,\n",
+        "    \n",
+        "    # Stop conditions\n",
+        "    #\"--stop\": '\\'{\"time_total_s\": 25000}\\'',\n",
+        "    #\"--stop\": '\\'{\"time_total_s\": 15000,\"episode_reward_mean\":2}\\'',\n",
+        "    \"--stop\": '\\'{\"time_total_s\": 36000,\"episode_reward_mean\":2}\\'',\n",
+        "    #\"--stop\": '\\'{\"time_total_s\": 60000}\\'',\n",
+        "    \n",
+        "    # Frequency of taking checkpoints\n",
+        "    \"--checkpoint-freq\": 1,\n",
+        "    \n",
+        "    # If a checkpoint should be taken at the end - optional argument with no value\n",
+        "    \"--checkpoint-at-end\": \"\",\n",
+        "    \n",
+        "    # Log directory\n",
+        "    \"--local-dir\": './logs'\n",
+        "}\n",
+        "\n",
+        "xvfb_env = None\n",
+        "#if video_capture:\n",
+        "    # Ray's video capture support requires to run everything under a headless display driver called (xvfb).\n",
+        "    # There are two parts to this:\n",
+        "    # 1. Use a custom docker file with proper instructions to install xvfb, ffmpeg, python-opengl\n",
+        "    # and other dependencies.\n",
+        "   \n",
+        "#    with open(\"files/docker/Dockerfile\", \"r\") as f:\n",
+        "#        dockerfile=f.read()\n",
+        "\n",
+        "#    xvfb_env = Environment(name='xvfb-vdisplay')\n",
+        "#    xvfb_env.docker.base_image = None\n",
+        "#    xvfb_env.docker.base_dockerfile = dockerfile\n",
+        "    \n",
+        "    # 2.  Execute the Python process via the xvfb-run command to set up the headless display driver.\n",
+        "#    xvfb_env.python.user_managed_dependencies = True\n",
+        "#    xvfb_env.python.interpreter_path = \"xvfb-run -s '-screen 0 640x480x16 -ac +extension GLX +render' python\"\n",
+        "\n",
+        "\n",
+        "training_estimator = ReinforcementLearningEstimator(\n",
+        "\n",
+        "    # Location of source files\n",
+        "    source_directory='files',\n",
+        "    \n",
+        "    # Python script file\n",
+        "    entry_script='BCTrade_training.py',\n",
+        "    \n",
+        "    # A dictionary of arguments to pass to the training script specified in ``entry_script``\n",
+        "    script_params=script_params,\n",
+        "    \n",
+        "    # The Azure Machine Learning compute target set up for Ray head nodes\n",
+        "    compute_target=compute_target,\n",
+        "    \n",
+        "    \n",
+        "    inputs=[\n",
+        "        checkpoint_ds.as_named_input('artifacts_dataset'),\n",
+        "        checkpoint_ds.as_named_input('artifacts_path').as_mount()],\n",
+        "    \n",
+        "    # Reinforcement learning framework. Currently must be Ray.\n",
+        "    rl_framework=Ray(),\n",
+        "    \n",
+        "    # Custom environmnet for Xvfb\n",
+        "    environment=xvfb_env\n",
+        ")"
+      ],
+      "outputs": [],
+      "execution_count": 6,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1647457754503
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "training_run = exp.submit(training_estimator)"
+      ],
+      "outputs": [],
+      "execution_count": 7,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1647457760714
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from azureml.widgets import RunDetails\n",
+        "\n",
+        "RunDetails(training_run).show()"
+      ],
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": "_RLWidget(widget_settings={'childWidgetDisplay': 'popup', 'send_telemetry': False, 'log_level': 'INFO', 'sdk_v…",
+            "application/vnd.jupyter.widget-view+json": {
+              "version_major": 2,
+              "version_minor": 0,
+              "model_id": "ef03b52d48b64a8bb9adce45d4990fa9"
+            }
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "application/aml.mini.widget.v1": "{\"status\": \"Running\", \"workbench_run_details_uri\": \"https://ml.azure.com/runs/BCTrade-Bitstamp_1_1647457757_e8155655?wsid=/subscriptions/736ac584-c533-43a9-8a83-d19bf290ffb8/resourcegroups/ml-rg/workspaces/ml-workspace&tid=3ffbf2df-6ac2-41dc-95c5-2f64a8024caf\", \"run_id\": \"BCTrade-Bitstamp_1_1647457757_e8155655\", \"run_properties\": {\"run_id\": \"BCTrade-Bitstamp_1_1647457757_e8155655\", \"created_utc\": \"2022-03-16T19:09:20.046457Z\", \"properties\": {}, \"tags\": {}, \"end_time_utc\": null, \"status\": \"Running\", \"log_files\": {\"azureml-logs/reinforcementlearning.txt\": \"https://rnikolaus.blob.core.windows.net/azureml/ExperimentRun/dcid.BCTrade-Bitstamp_1_1647457757_e8155655/azureml-logs/reinforcementlearning.txt?sv=2019-07-07&sr=b&sig=bWf%2BwIFgdgw6L2%2FIyIAvv7aIpsmTgibkLXt30TXfy50%3D&skoid=e2479b93-fc73-41fb-89ce-5cfc3e486410&sktid=3ffbf2df-6ac2-41dc-95c5-2f64a8024caf&skt=2022-03-16T18%3A05%3A09Z&ske=2022-03-18T02%3A15%3A09Z&sks=b&skv=2019-07-07&st=2022-03-16T19%3A04%3A36Z&se=2022-03-17T03%3A14%3A36Z&sp=r\"}, \"log_groups\": [[\"azureml-logs/reinforcementlearning.txt\"]], \"run_duration\": \"0:05:39\", \"run_number\": \"1647457760\", \"run_queued_details\": {\"status\": \"Running\", \"details\": null}}, \"child_runs\": [{\"run_id\": \"BCTrade-Bitstamp_1_1647457757_e8155655_head\", \"run_number\": 1647457766, \"metric\": null, \"status\": \"Running\", \"run_type\": \"azureml.scriptrun\", \"training_percent\": null, \"start_time\": \"2022-03-16T19:09:39.175018Z\", \"end_time\": \"\", \"created_time\": \"2022-03-16T19:09:26.74849Z\", \"created_time_dt\": \"2022-03-16T19:09:26.74849Z\", \"duration\": \"0:05:33\"}], \"children_metrics\": {\"categories\": null, \"series\": null, \"metricName\": null}, \"run_metrics\": [], \"run_logs\": \"[2022-03-16T19:09:20.4122767Z][Info]Starting reinforcement learning run with id BCTrade-Bitstamp_1_1647457757_e8155655.\\n[2022-03-16T19:09:26.0084672Z][Info]Starting head node child run with id BCTrade-Bitstamp_1_1647457757_e8155655_head.\\n\", \"graph\": {}, \"widget_settings\": {\"childWidgetDisplay\": \"popup\", \"send_telemetry\": false, \"log_level\": \"INFO\", \"sdk_version\": \"1.37.0\"}, \"loading\": false}"
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 8,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1647457761071
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3-azureml",
+      "language": "python",
+      "display_name": "Python 3.6 - AzureML"
+    },
+    "language_info": {
+      "name": "python",
+      "version": "3.6.9",
+      "mimetype": "text/x-python",
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "pygments_lexer": "ipython3",
+      "nbconvert_exporter": "python",
+      "file_extension": ".py"
+    },
+    "kernel_info": {
+      "name": "python3-azureml"
+    },
+    "microsoft": {
+      "host": {
+        "AzureML": {
+          "notebookHasBeenCompleted": true
+        }
+      }
+    },
+    "nteract": {
+      "version": "nteract-front-end@1.0.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 2
+}

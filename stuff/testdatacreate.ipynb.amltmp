@@ -1,0 +1,264 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "source": [
+        "from azureml.core import Dataset\r\n",
+        "from azureml.core import Workspace\r\n",
+        "import datetime\r\n",
+        "\r\n",
+        "ws = Workspace.from_config()\r\n",
+        "dataset = Dataset.get_by_name(ws, name='BTC-Bitstamp-raw')\r\n",
+        "\r\n",
+        "df = dataset.to_pandas_dataframe()\r\n",
+        "df = df.rename(columns={\"Timestamp\": \"dateid\", \"Close\": \"price\",\"Volume_(BTC)\":\"volume\"})\r\n",
+        "\r\n",
+        "\r\n",
+        "df"
+      ],
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "execution_count": 1,
+          "data": {
+            "text/plain": "             dateid      Open      High       Low     price    volume  \\\n0        1325317920      4.39      4.39      4.39      4.39  0.455581   \n1        1325317980       NaN       NaN       NaN       NaN       NaN   \n2        1325318040       NaN       NaN       NaN       NaN       NaN   \n3        1325318100       NaN       NaN       NaN       NaN       NaN   \n4        1325318160       NaN       NaN       NaN       NaN       NaN   \n...             ...       ...       ...       ...       ...       ...   \n4857372  1617148560  58714.31  58714.31  58686.00  58686.00  1.384487   \n4857373  1617148620  58683.97  58693.43  58683.97  58685.81  7.294848   \n4857374  1617148680  58693.43  58723.84  58693.43  58723.84  1.705682   \n4857375  1617148740  58742.18  58770.38  58742.18  58760.59  0.720415   \n4857376  1617148800  58767.75  58778.18  58755.97  58778.18  2.712831   \n\n         Volume_(Currency)  Weighted_Price  \n0                 2.000000        4.390000  \n1                      NaN             NaN  \n2                      NaN             NaN  \n3                      NaN             NaN  \n4                      NaN             NaN  \n...                    ...             ...  \n4857372       81259.372187    58692.753339  \n4857373      428158.146640    58693.226508  \n4857374      100117.070370    58696.198496  \n4857375       42332.958633    58761.866202  \n4857376      159417.751000    58764.349363  \n\n[4857377 rows x 8 columns]",
+            "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>dateid</th>\n      <th>Open</th>\n      <th>High</th>\n      <th>Low</th>\n      <th>price</th>\n      <th>volume</th>\n      <th>Volume_(Currency)</th>\n      <th>Weighted_Price</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>1325317920</td>\n      <td>4.39</td>\n      <td>4.39</td>\n      <td>4.39</td>\n      <td>4.39</td>\n      <td>0.455581</td>\n      <td>2.000000</td>\n      <td>4.390000</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>1325317980</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>1325318040</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>1325318100</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>1325318160</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>4857372</th>\n      <td>1617148560</td>\n      <td>58714.31</td>\n      <td>58714.31</td>\n      <td>58686.00</td>\n      <td>58686.00</td>\n      <td>1.384487</td>\n      <td>81259.372187</td>\n      <td>58692.753339</td>\n    </tr>\n    <tr>\n      <th>4857373</th>\n      <td>1617148620</td>\n      <td>58683.97</td>\n      <td>58693.43</td>\n      <td>58683.97</td>\n      <td>58685.81</td>\n      <td>7.294848</td>\n      <td>428158.146640</td>\n      <td>58693.226508</td>\n    </tr>\n    <tr>\n      <th>4857374</th>\n      <td>1617148680</td>\n      <td>58693.43</td>\n      <td>58723.84</td>\n      <td>58693.43</td>\n      <td>58723.84</td>\n      <td>1.705682</td>\n      <td>100117.070370</td>\n      <td>58696.198496</td>\n    </tr>\n    <tr>\n      <th>4857375</th>\n      <td>1617148740</td>\n      <td>58742.18</td>\n      <td>58770.38</td>\n      <td>58742.18</td>\n      <td>58760.59</td>\n      <td>0.720415</td>\n      <td>42332.958633</td>\n      <td>58761.866202</td>\n    </tr>\n    <tr>\n      <th>4857376</th>\n      <td>1617148800</td>\n      <td>58767.75</td>\n      <td>58778.18</td>\n      <td>58755.97</td>\n      <td>58778.18</td>\n      <td>2.712831</td>\n      <td>159417.751000</td>\n      <td>58764.349363</td>\n    </tr>\n  </tbody>\n</table>\n<p>4857377 rows × 8 columns</p>\n</div>"
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 1,
+      "metadata": {
+        "gather": {
+          "logged": 1646500827244
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "dateparse = lambda x: datetime.datetime.utcfromtimestamp(float(x))\r\n",
+        "df['date'] = [dateparse(x) for x in df['dateid']]\r\n",
+        "df = df.set_index('date')\r\n",
+        "del df['dateid']\r\n",
+        "df['ask'] = df['price']*1.01\r\n",
+        "df['bid'] = df['price']*0.99\r\n",
+        "df = df.reindex(columns=['price','ask','bid','volume','High','Low'])\r\n",
+        "df"
+      ],
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "execution_count": 2,
+          "data": {
+            "text/plain": "                        price         ask         bid    volume      High  \\\ndate                                                                        \n2011-12-31 07:52:00      4.39      4.4339      4.3461  0.455581      4.39   \n2011-12-31 07:53:00       NaN         NaN         NaN       NaN       NaN   \n2011-12-31 07:54:00       NaN         NaN         NaN       NaN       NaN   \n2011-12-31 07:55:00       NaN         NaN         NaN       NaN       NaN   \n2011-12-31 07:56:00       NaN         NaN         NaN       NaN       NaN   \n...                       ...         ...         ...       ...       ...   \n2021-03-30 23:56:00  58686.00  59272.8600  58099.1400  1.384487  58714.31   \n2021-03-30 23:57:00  58685.81  59272.6681  58098.9519  7.294848  58693.43   \n2021-03-30 23:58:00  58723.84  59311.0784  58136.6016  1.705682  58723.84   \n2021-03-30 23:59:00  58760.59  59348.1959  58172.9841  0.720415  58770.38   \n2021-03-31 00:00:00  58778.18  59365.9618  58190.3982  2.712831  58778.18   \n\n                          Low  \ndate                           \n2011-12-31 07:52:00      4.39  \n2011-12-31 07:53:00       NaN  \n2011-12-31 07:54:00       NaN  \n2011-12-31 07:55:00       NaN  \n2011-12-31 07:56:00       NaN  \n...                       ...  \n2021-03-30 23:56:00  58686.00  \n2021-03-30 23:57:00  58683.97  \n2021-03-30 23:58:00  58693.43  \n2021-03-30 23:59:00  58742.18  \n2021-03-31 00:00:00  58755.97  \n\n[4857377 rows x 6 columns]",
+            "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>price</th>\n      <th>ask</th>\n      <th>bid</th>\n      <th>volume</th>\n      <th>High</th>\n      <th>Low</th>\n    </tr>\n    <tr>\n      <th>date</th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>2011-12-31 07:52:00</th>\n      <td>4.39</td>\n      <td>4.4339</td>\n      <td>4.3461</td>\n      <td>0.455581</td>\n      <td>4.39</td>\n      <td>4.39</td>\n    </tr>\n    <tr>\n      <th>2011-12-31 07:53:00</th>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>2011-12-31 07:54:00</th>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>2011-12-31 07:55:00</th>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>2011-12-31 07:56:00</th>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:56:00</th>\n      <td>58686.00</td>\n      <td>59272.8600</td>\n      <td>58099.1400</td>\n      <td>1.384487</td>\n      <td>58714.31</td>\n      <td>58686.00</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:57:00</th>\n      <td>58685.81</td>\n      <td>59272.6681</td>\n      <td>58098.9519</td>\n      <td>7.294848</td>\n      <td>58693.43</td>\n      <td>58683.97</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:58:00</th>\n      <td>58723.84</td>\n      <td>59311.0784</td>\n      <td>58136.6016</td>\n      <td>1.705682</td>\n      <td>58723.84</td>\n      <td>58693.43</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:59:00</th>\n      <td>58760.59</td>\n      <td>59348.1959</td>\n      <td>58172.9841</td>\n      <td>0.720415</td>\n      <td>58770.38</td>\n      <td>58742.18</td>\n    </tr>\n    <tr>\n      <th>2021-03-31 00:00:00</th>\n      <td>58778.18</td>\n      <td>59365.9618</td>\n      <td>58190.3982</td>\n      <td>2.712831</td>\n      <td>58778.18</td>\n      <td>58755.97</td>\n    </tr>\n  </tbody>\n</table>\n<p>4857377 rows × 6 columns</p>\n</div>"
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 2,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1646500831067
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#df = df.dropna()\r\n",
+        "\r\n",
+        "def delta(timeseriesShort, timeseriesLong):\r\n",
+        "    return ((timeseriesShort/timeseriesLong)-1).clip(-3,3)\r\n",
+        "\r\n",
+        "def addMa(timeframe):\r\n",
+        "    p=df['price']\r\n",
+        "    df['ma'+timeframe] = delta(p,p.rolling(timeframe).mean())\r\n",
+        "\r\n",
+        "def add2Ma(timeframeshort, timeframelong):\r\n",
+        "    p=df['price']\r\n",
+        "    df['ma'+timeframeshort+'_'+timeframelong] =delta(p.rolling(timeframeshort).mean(),p.rolling(timeframelong).mean())\r\n",
+        "\r\n",
+        "\r\n",
+        "def addMinMax(timeframe,periods,freq):\r\n",
+        "    p=df['price']\r\n",
+        "    dfs = df.shift(periods=periods, freq=freq)\r\n",
+        "    mins = dfs['Low'].rolling(timeframe).min()\r\n",
+        "    df['maxmin'+timeframe]=((p - mins)/(dfs['High'].rolling(timeframe).max() - mins)).clip(-3,3)\r\n",
+        "    \r\n",
+        "\r\n",
+        "def addBol(timeframe):\r\n",
+        "    p=df['price']\r\n",
+        "    df['bol'+timeframe] = (delta(p,p.rolling(timeframe).mean())/p.rolling(timeframe).std()).clip(-3,3)\r\n",
+        "\r\n",
+        "def addStdDir(timeframe,periods,freq):\r\n",
+        "    p=df['price']\r\n",
+        "    val=p.rolling(timeframe).std()\r\n",
+        "    df['stddir'+timeframe] = delta(val,val.shift(periods=periods, freq=freq))\r\n",
+        "\r\n",
+        "def addMaDir(timeframe,periods,freq):\r\n",
+        "    p=df['price']\r\n",
+        "    val = p.rolling(timeframe).mean()\r\n",
+        "    df['madir'+timeframe] = delta(val,val.shift(periods=periods, freq=freq))\r\n",
+        "\r\n",
+        "\r\n",
+        "\r\n",
+        "\r\n",
+        "\r\n",
+        "\r\n",
+        "\r\n",
+        "addMa('5min')\r\n",
+        "addMa('1h')\r\n",
+        "addMa('5D')\r\n",
+        "addBol('20D')\r\n",
+        "addMinMax('10D',1,\"D\")\r\n",
+        "addBol('5D')\r\n",
+        "add2Ma('6min','13min')\r\n",
+        "add2Ma('6h','13h')\r\n",
+        "addMaDir('15min',5,\"min\")\r\n",
+        "addStdDir('1D',5,\"min\")\r\n",
+        "\r\n",
+        "df = df.dropna()\r\n",
+        "\r\n",
+        "    \r\n",
+        "del df['High']\r\n",
+        "del df['Low']\r\n",
+        "\r\n",
+        "df"
+      ],
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "execution_count": 3,
+          "data": {
+            "text/plain": "                        price         ask         bid     volume    ma5min  \\\ndate                                                                         \n2012-01-03 17:26:00      5.29      5.3429      5.2371  11.000000  0.000000   \n2012-01-03 17:27:00      5.29      5.3429      5.2371   4.010815  0.000000   \n2012-01-04 12:57:00      5.19      5.2419      5.1381   8.724470  0.000000   \n2012-01-04 15:53:00      5.32      5.3732      5.2668   0.186090  0.000000   \n2012-01-04 15:54:00      5.32      5.3732      5.2668  10.394737  0.000000   \n...                       ...         ...         ...        ...       ...   \n2021-03-30 23:56:00  58686.00  59272.8600  58099.1400   1.384487 -0.000404   \n2021-03-30 23:57:00  58685.81  59272.6681  58098.9519   7.294848 -0.000325   \n2021-03-30 23:58:00  58723.84  59311.0784  58136.6016   1.705682  0.000236   \n2021-03-30 23:59:00  58760.59  59348.1959  58172.9841   0.720415  0.000792   \n2021-03-31 00:00:00  58778.18  59365.9618  58190.3982   2.712831  0.000873   \n\n                             ma1h      ma5D    bol20D  maxmin10D     bol5D  \\\ndate                                                                         \n2012-01-03 17:26:00  9.541985e-03  0.071139  0.203399   1.475410  0.203399   \n2012-01-03 17:27:00  7.139457e-03  0.066398  0.190185   1.475410  0.190185   \n2012-01-04 12:57:00  2.220446e-16  0.042064  0.132066   0.860215  0.132066   \n2012-01-04 15:53:00  1.236917e-02  0.062841  0.200012   1.000000  0.200012   \n2012-01-04 15:54:00  8.212255e-03  0.059945  0.190974   1.000000  0.190974   \n...                           ...       ...       ...        ...       ...   \n2021-03-30 23:56:00  3.096598e-04  0.049769  0.000017   0.867563  0.000027   \n2021-03-30 23:57:00  3.125800e-04  0.049747  0.000017   0.867543  0.000027   \n2021-03-30 23:58:00  9.555471e-04  0.050408  0.000017   0.871506  0.000027   \n2021-03-30 23:59:00  1.567403e-03  0.051046  0.000017   0.875335  0.000027   \n2021-03-31 00:00:00  1.831572e-03  0.051341  0.000018   0.877168  0.000027   \n\n                     ma6min_13min      ma6h_13h  madir15min  stddir1D  \ndate                                                                   \n2012-01-03 17:26:00      0.014382  2.220446e-16    0.000000 -0.039384  \n2012-01-03 17:27:00      0.000000  2.220446e-16    0.004794 -0.076904  \n2012-01-04 12:57:00      0.000000  2.569170e-02    0.000000 -0.050786  \n2012-01-04 15:53:00      0.000000  1.902439e-02    0.012524  0.008568  \n2012-01-04 15:54:00      0.000000  1.729970e-02    0.025048  0.004977  \n...                           ...           ...         ...       ...  \n2021-03-30 23:56:00      0.000530 -1.043274e-03    0.000471 -0.001104  \n2021-03-30 23:57:00      0.000361 -1.040359e-03    0.000554 -0.001444  \n2021-03-30 23:58:00      0.000238 -1.038407e-03    0.000575 -0.001463  \n2021-03-30 23:59:00      0.000281 -1.034919e-03    0.000620 -0.001530  \n2021-03-31 00:00:00      0.000283 -1.031370e-03    0.000717 -0.001457  \n\n[3601378 rows x 14 columns]",
+            "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>price</th>\n      <th>ask</th>\n      <th>bid</th>\n      <th>volume</th>\n      <th>ma5min</th>\n      <th>ma1h</th>\n      <th>ma5D</th>\n      <th>bol20D</th>\n      <th>maxmin10D</th>\n      <th>bol5D</th>\n      <th>ma6min_13min</th>\n      <th>ma6h_13h</th>\n      <th>madir15min</th>\n      <th>stddir1D</th>\n    </tr>\n    <tr>\n      <th>date</th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>2012-01-03 17:26:00</th>\n      <td>5.29</td>\n      <td>5.3429</td>\n      <td>5.2371</td>\n      <td>11.000000</td>\n      <td>0.000000</td>\n      <td>9.541985e-03</td>\n      <td>0.071139</td>\n      <td>0.203399</td>\n      <td>1.475410</td>\n      <td>0.203399</td>\n      <td>0.014382</td>\n      <td>2.220446e-16</td>\n      <td>0.000000</td>\n      <td>-0.039384</td>\n    </tr>\n    <tr>\n      <th>2012-01-03 17:27:00</th>\n      <td>5.29</td>\n      <td>5.3429</td>\n      <td>5.2371</td>\n      <td>4.010815</td>\n      <td>0.000000</td>\n      <td>7.139457e-03</td>\n      <td>0.066398</td>\n      <td>0.190185</td>\n      <td>1.475410</td>\n      <td>0.190185</td>\n      <td>0.000000</td>\n      <td>2.220446e-16</td>\n      <td>0.004794</td>\n      <td>-0.076904</td>\n    </tr>\n    <tr>\n      <th>2012-01-04 12:57:00</th>\n      <td>5.19</td>\n      <td>5.2419</td>\n      <td>5.1381</td>\n      <td>8.724470</td>\n      <td>0.000000</td>\n      <td>2.220446e-16</td>\n      <td>0.042064</td>\n      <td>0.132066</td>\n      <td>0.860215</td>\n      <td>0.132066</td>\n      <td>0.000000</td>\n      <td>2.569170e-02</td>\n      <td>0.000000</td>\n      <td>-0.050786</td>\n    </tr>\n    <tr>\n      <th>2012-01-04 15:53:00</th>\n      <td>5.32</td>\n      <td>5.3732</td>\n      <td>5.2668</td>\n      <td>0.186090</td>\n      <td>0.000000</td>\n      <td>1.236917e-02</td>\n      <td>0.062841</td>\n      <td>0.200012</td>\n      <td>1.000000</td>\n      <td>0.200012</td>\n      <td>0.000000</td>\n      <td>1.902439e-02</td>\n      <td>0.012524</td>\n      <td>0.008568</td>\n    </tr>\n    <tr>\n      <th>2012-01-04 15:54:00</th>\n      <td>5.32</td>\n      <td>5.3732</td>\n      <td>5.2668</td>\n      <td>10.394737</td>\n      <td>0.000000</td>\n      <td>8.212255e-03</td>\n      <td>0.059945</td>\n      <td>0.190974</td>\n      <td>1.000000</td>\n      <td>0.190974</td>\n      <td>0.000000</td>\n      <td>1.729970e-02</td>\n      <td>0.025048</td>\n      <td>0.004977</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:56:00</th>\n      <td>58686.00</td>\n      <td>59272.8600</td>\n      <td>58099.1400</td>\n      <td>1.384487</td>\n      <td>-0.000404</td>\n      <td>3.096598e-04</td>\n      <td>0.049769</td>\n      <td>0.000017</td>\n      <td>0.867563</td>\n      <td>0.000027</td>\n      <td>0.000530</td>\n      <td>-1.043274e-03</td>\n      <td>0.000471</td>\n      <td>-0.001104</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:57:00</th>\n      <td>58685.81</td>\n      <td>59272.6681</td>\n      <td>58098.9519</td>\n      <td>7.294848</td>\n      <td>-0.000325</td>\n      <td>3.125800e-04</td>\n      <td>0.049747</td>\n      <td>0.000017</td>\n      <td>0.867543</td>\n      <td>0.000027</td>\n      <td>0.000361</td>\n      <td>-1.040359e-03</td>\n      <td>0.000554</td>\n      <td>-0.001444</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:58:00</th>\n      <td>58723.84</td>\n      <td>59311.0784</td>\n      <td>58136.6016</td>\n      <td>1.705682</td>\n      <td>0.000236</td>\n      <td>9.555471e-04</td>\n      <td>0.050408</td>\n      <td>0.000017</td>\n      <td>0.871506</td>\n      <td>0.000027</td>\n      <td>0.000238</td>\n      <td>-1.038407e-03</td>\n      <td>0.000575</td>\n      <td>-0.001463</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:59:00</th>\n      <td>58760.59</td>\n      <td>59348.1959</td>\n      <td>58172.9841</td>\n      <td>0.720415</td>\n      <td>0.000792</td>\n      <td>1.567403e-03</td>\n      <td>0.051046</td>\n      <td>0.000017</td>\n      <td>0.875335</td>\n      <td>0.000027</td>\n      <td>0.000281</td>\n      <td>-1.034919e-03</td>\n      <td>0.000620</td>\n      <td>-0.001530</td>\n    </tr>\n    <tr>\n      <th>2021-03-31 00:00:00</th>\n      <td>58778.18</td>\n      <td>59365.9618</td>\n      <td>58190.3982</td>\n      <td>2.712831</td>\n      <td>0.000873</td>\n      <td>1.831572e-03</td>\n      <td>0.051341</td>\n      <td>0.000018</td>\n      <td>0.877168</td>\n      <td>0.000027</td>\n      <td>0.000283</td>\n      <td>-1.031370e-03</td>\n      <td>0.000717</td>\n      <td>-0.001457</td>\n    </tr>\n  </tbody>\n</table>\n<p>3601378 rows × 14 columns</p>\n</div>"
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 3,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1646500844715
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def zigzag(df):\r\n",
+        "    from collections import deque\r\n",
+        "    import numpy as np\r\n",
+        "    import pandas as pd\r\n",
+        "\r\n",
+        "    res = deque([np.nan]*5,maxlen=5)\r\n",
+        "    val= None\r\n",
+        "    up=True\r\n",
+        "    factor = 5/100.0\r\n",
+        "    result = {}\r\n",
+        "    for row in df.itertuples(index=True):\r\n",
+        "        if val == None: \r\n",
+        "            val=row.price\r\n",
+        "        if up:\r\n",
+        "            if val < row.ask:\r\n",
+        "                val=row.ask\r\n",
+        "            elif val*(1-factor) > row.bid:\r\n",
+        "                res.appendleft(val)\r\n",
+        "                up=False\r\n",
+        "                val = row.bid\r\n",
+        "        else:\r\n",
+        "            if val > row.bid:\r\n",
+        "                val=row.bid\r\n",
+        "            elif val*(1+factor) < row.ask:\r\n",
+        "                res.appendleft(val)\r\n",
+        "                up=True\r\n",
+        "                val = row.ask\r\n",
+        "        result[row.Index]=[(row.price/res[0])-1,(row.price/res[1])-1,(row.price/res[2])-1,(row.price/res[3])-1,(row.price/res[4])-1]\r\n",
+        "    df2=pd.DataFrame.from_dict(result, orient='index',columns=['Zigzag0', 'Zigzag1', 'Zigzag2', 'Zigzag3', 'Zigzag4']).dropna().clip(-3,3)\r\n",
+        "    return df.join(df2,how='right')\r\n",
+        "\r\n",
+        "zigzag(df)"
+      ],
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "execution_count": 5,
+          "data": {
+            "text/plain": "                        price         ask         bid    volume        ma5min  \\\n2012-01-13 20:34:00      6.72      6.7872      6.6528  0.991071 -4.409673e-02   \n2012-01-14 00:57:00      6.50      6.5650      6.4350  1.545595  4.440892e-16   \n2012-01-14 00:59:00      6.50      6.5650      6.4350  4.740000  2.220446e-16   \n2012-01-14 01:08:00      6.50      6.5650      6.4350  1.543210  4.440892e-16   \n2012-01-14 01:09:00      6.40      6.4640      6.3360  1.689531 -7.751938e-03   \n...                       ...         ...         ...       ...           ...   \n2021-03-30 23:56:00  58686.00  59272.8600  58099.1400  1.384487 -4.035109e-04   \n2021-03-30 23:57:00  58685.81  59272.6681  58098.9519  7.294848 -3.254242e-04   \n2021-03-30 23:58:00  58723.84  59311.0784  58136.6016  1.705682  2.360416e-04   \n2021-03-30 23:59:00  58760.59  59348.1959  58172.9841  0.720415  7.916325e-04   \n2021-03-31 00:00:00  58778.18  59365.9618  58190.3982  2.712831  8.734671e-04   \n\n                             ma1h      ma5D    bol20D  maxmin10D     bol5D  \\\n2012-01-13 20:34:00 -5.849387e-02 -0.021203  0.032878   0.730612 -0.065190   \n2012-01-14 00:57:00  1.110223e-15 -0.051963 -0.017874   0.640816 -0.159191   \n2012-01-14 00:59:00  8.881784e-16 -0.051659 -0.017835   0.640816 -0.158169   \n2012-01-14 01:08:00  6.661338e-16 -0.051358 -0.017796   0.640816 -0.157167   \n2012-01-14 01:09:00 -1.285347e-02 -0.065577 -0.041114   0.600000 -0.200127   \n...                           ...       ...       ...        ...       ...   \n2021-03-30 23:56:00  3.096598e-04  0.049769  0.000017   0.867563  0.000027   \n2021-03-30 23:57:00  3.125800e-04  0.049747  0.000017   0.867543  0.000027   \n2021-03-30 23:58:00  9.555471e-04  0.050408  0.000017   0.871506  0.000027   \n2021-03-30 23:59:00  1.567403e-03  0.051046  0.000017   0.875335  0.000027   \n2021-03-31 00:00:00  1.831572e-03  0.051341  0.000018   0.877168  0.000027   \n\n                     ma6min_13min  ma6h_13h    madir15min  stddir1D   Zigzag0  \\\n2012-01-13 20:34:00 -5.551115e-16  0.003615 -4.223433e-02  0.035861 -0.093533   \n2012-01-14 00:57:00 -1.110223e-15  0.000306  0.000000e+00  0.027763 -0.123209   \n2012-01-14 00:59:00 -5.551115e-16 -0.002678  0.000000e+00  0.051072 -0.123209   \n2012-01-14 01:08:00 -6.661338e-16 -0.005963 -2.220446e-16  0.018667 -0.123209   \n2012-01-14 01:09:00 -3.861004e-03 -0.008408 -3.846154e-03  0.050760 -0.136698   \n...                           ...       ...           ...       ...       ...   \n2021-03-30 23:56:00  5.304840e-04 -0.001043  4.714758e-04 -0.001104  0.084109   \n2021-03-30 23:57:00  3.605455e-04 -0.001040  5.538280e-04 -0.001444  0.084105   \n2021-03-30 23:58:00  2.383971e-04 -0.001038  5.746616e-04 -0.001463  0.084808   \n2021-03-30 23:59:00  2.811379e-04 -0.001035  6.197419e-04 -0.001530  0.085487   \n2021-03-31 00:00:00  2.826266e-04 -0.001031  7.173206e-04 -0.001457  0.085812   \n\n                      Zigzag1   Zigzag2   Zigzag3   Zigzag4  \n2012-01-13 20:34:00  0.042685 -0.075908  0.063931 -0.035730  \n2012-01-14 00:57:00  0.008549 -0.106161  0.029100 -0.067298  \n2012-01-14 00:59:00  0.008549 -0.106161  0.029100 -0.067298  \n2012-01-14 01:08:00  0.008549 -0.106161  0.029100 -0.067298  \n2012-01-14 01:09:00 -0.006967 -0.119912  0.013267 -0.081647  \n...                       ...       ...       ...       ...  \n2021-03-30 23:56:00  0.026736  0.176011  0.091872  0.149508  \n2021-03-30 23:57:00  0.026733  0.176008  0.091869  0.149504  \n2021-03-30 23:58:00  0.027398  0.176770  0.092576  0.150249  \n2021-03-30 23:59:00  0.028041  0.177506  0.093260  0.150969  \n2021-03-31 00:00:00  0.028349  0.177859  0.093587  0.151313  \n\n[3601292 rows x 19 columns]",
+            "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>price</th>\n      <th>ask</th>\n      <th>bid</th>\n      <th>volume</th>\n      <th>ma5min</th>\n      <th>ma1h</th>\n      <th>ma5D</th>\n      <th>bol20D</th>\n      <th>maxmin10D</th>\n      <th>bol5D</th>\n      <th>ma6min_13min</th>\n      <th>ma6h_13h</th>\n      <th>madir15min</th>\n      <th>stddir1D</th>\n      <th>Zigzag0</th>\n      <th>Zigzag1</th>\n      <th>Zigzag2</th>\n      <th>Zigzag3</th>\n      <th>Zigzag4</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>2012-01-13 20:34:00</th>\n      <td>6.72</td>\n      <td>6.7872</td>\n      <td>6.6528</td>\n      <td>0.991071</td>\n      <td>-4.409673e-02</td>\n      <td>-5.849387e-02</td>\n      <td>-0.021203</td>\n      <td>0.032878</td>\n      <td>0.730612</td>\n      <td>-0.065190</td>\n      <td>-5.551115e-16</td>\n      <td>0.003615</td>\n      <td>-4.223433e-02</td>\n      <td>0.035861</td>\n      <td>-0.093533</td>\n      <td>0.042685</td>\n      <td>-0.075908</td>\n      <td>0.063931</td>\n      <td>-0.035730</td>\n    </tr>\n    <tr>\n      <th>2012-01-14 00:57:00</th>\n      <td>6.50</td>\n      <td>6.5650</td>\n      <td>6.4350</td>\n      <td>1.545595</td>\n      <td>4.440892e-16</td>\n      <td>1.110223e-15</td>\n      <td>-0.051963</td>\n      <td>-0.017874</td>\n      <td>0.640816</td>\n      <td>-0.159191</td>\n      <td>-1.110223e-15</td>\n      <td>0.000306</td>\n      <td>0.000000e+00</td>\n      <td>0.027763</td>\n      <td>-0.123209</td>\n      <td>0.008549</td>\n      <td>-0.106161</td>\n      <td>0.029100</td>\n      <td>-0.067298</td>\n    </tr>\n    <tr>\n      <th>2012-01-14 00:59:00</th>\n      <td>6.50</td>\n      <td>6.5650</td>\n      <td>6.4350</td>\n      <td>4.740000</td>\n      <td>2.220446e-16</td>\n      <td>8.881784e-16</td>\n      <td>-0.051659</td>\n      <td>-0.017835</td>\n      <td>0.640816</td>\n      <td>-0.158169</td>\n      <td>-5.551115e-16</td>\n      <td>-0.002678</td>\n      <td>0.000000e+00</td>\n      <td>0.051072</td>\n      <td>-0.123209</td>\n      <td>0.008549</td>\n      <td>-0.106161</td>\n      <td>0.029100</td>\n      <td>-0.067298</td>\n    </tr>\n    <tr>\n      <th>2012-01-14 01:08:00</th>\n      <td>6.50</td>\n      <td>6.5650</td>\n      <td>6.4350</td>\n      <td>1.543210</td>\n      <td>4.440892e-16</td>\n      <td>6.661338e-16</td>\n      <td>-0.051358</td>\n      <td>-0.017796</td>\n      <td>0.640816</td>\n      <td>-0.157167</td>\n      <td>-6.661338e-16</td>\n      <td>-0.005963</td>\n      <td>-2.220446e-16</td>\n      <td>0.018667</td>\n      <td>-0.123209</td>\n      <td>0.008549</td>\n      <td>-0.106161</td>\n      <td>0.029100</td>\n      <td>-0.067298</td>\n    </tr>\n    <tr>\n      <th>2012-01-14 01:09:00</th>\n      <td>6.40</td>\n      <td>6.4640</td>\n      <td>6.3360</td>\n      <td>1.689531</td>\n      <td>-7.751938e-03</td>\n      <td>-1.285347e-02</td>\n      <td>-0.065577</td>\n      <td>-0.041114</td>\n      <td>0.600000</td>\n      <td>-0.200127</td>\n      <td>-3.861004e-03</td>\n      <td>-0.008408</td>\n      <td>-3.846154e-03</td>\n      <td>0.050760</td>\n      <td>-0.136698</td>\n      <td>-0.006967</td>\n      <td>-0.119912</td>\n      <td>0.013267</td>\n      <td>-0.081647</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:56:00</th>\n      <td>58686.00</td>\n      <td>59272.8600</td>\n      <td>58099.1400</td>\n      <td>1.384487</td>\n      <td>-4.035109e-04</td>\n      <td>3.096598e-04</td>\n      <td>0.049769</td>\n      <td>0.000017</td>\n      <td>0.867563</td>\n      <td>0.000027</td>\n      <td>5.304840e-04</td>\n      <td>-0.001043</td>\n      <td>4.714758e-04</td>\n      <td>-0.001104</td>\n      <td>0.084109</td>\n      <td>0.026736</td>\n      <td>0.176011</td>\n      <td>0.091872</td>\n      <td>0.149508</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:57:00</th>\n      <td>58685.81</td>\n      <td>59272.6681</td>\n      <td>58098.9519</td>\n      <td>7.294848</td>\n      <td>-3.254242e-04</td>\n      <td>3.125800e-04</td>\n      <td>0.049747</td>\n      <td>0.000017</td>\n      <td>0.867543</td>\n      <td>0.000027</td>\n      <td>3.605455e-04</td>\n      <td>-0.001040</td>\n      <td>5.538280e-04</td>\n      <td>-0.001444</td>\n      <td>0.084105</td>\n      <td>0.026733</td>\n      <td>0.176008</td>\n      <td>0.091869</td>\n      <td>0.149504</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:58:00</th>\n      <td>58723.84</td>\n      <td>59311.0784</td>\n      <td>58136.6016</td>\n      <td>1.705682</td>\n      <td>2.360416e-04</td>\n      <td>9.555471e-04</td>\n      <td>0.050408</td>\n      <td>0.000017</td>\n      <td>0.871506</td>\n      <td>0.000027</td>\n      <td>2.383971e-04</td>\n      <td>-0.001038</td>\n      <td>5.746616e-04</td>\n      <td>-0.001463</td>\n      <td>0.084808</td>\n      <td>0.027398</td>\n      <td>0.176770</td>\n      <td>0.092576</td>\n      <td>0.150249</td>\n    </tr>\n    <tr>\n      <th>2021-03-30 23:59:00</th>\n      <td>58760.59</td>\n      <td>59348.1959</td>\n      <td>58172.9841</td>\n      <td>0.720415</td>\n      <td>7.916325e-04</td>\n      <td>1.567403e-03</td>\n      <td>0.051046</td>\n      <td>0.000017</td>\n      <td>0.875335</td>\n      <td>0.000027</td>\n      <td>2.811379e-04</td>\n      <td>-0.001035</td>\n      <td>6.197419e-04</td>\n      <td>-0.001530</td>\n      <td>0.085487</td>\n      <td>0.028041</td>\n      <td>0.177506</td>\n      <td>0.093260</td>\n      <td>0.150969</td>\n    </tr>\n    <tr>\n      <th>2021-03-31 00:00:00</th>\n      <td>58778.18</td>\n      <td>59365.9618</td>\n      <td>58190.3982</td>\n      <td>2.712831</td>\n      <td>8.734671e-04</td>\n      <td>1.831572e-03</td>\n      <td>0.051341</td>\n      <td>0.000018</td>\n      <td>0.877168</td>\n      <td>0.000027</td>\n      <td>2.826266e-04</td>\n      <td>-0.001031</td>\n      <td>7.173206e-04</td>\n      <td>-0.001457</td>\n      <td>0.085812</td>\n      <td>0.028349</td>\n      <td>0.177859</td>\n      <td>0.093587</td>\n      <td>0.151313</td>\n    </tr>\n  </tbody>\n</table>\n<p>3601292 rows × 19 columns</p>\n</div>"
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 5,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1646501039712
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3-azureml",
+      "language": "python",
+      "display_name": "Python 3.6 - AzureML"
+    },
+    "language_info": {
+      "name": "python",
+      "version": "3.6.9",
+      "mimetype": "text/x-python",
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "pygments_lexer": "ipython3",
+      "nbconvert_exporter": "python",
+      "file_extension": ".py"
+    },
+    "kernel_info": {
+      "name": "python3-azureml"
+    },
+    "microsoft": {
+      "host": {
+        "AzureML": {
+          "notebookHasBeenCompleted": true
+        }
+      }
+    },
+    "nteract": {
+      "version": "nteract-front-end@1.0.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 2
+}

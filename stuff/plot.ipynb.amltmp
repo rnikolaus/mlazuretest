@@ -1,0 +1,180 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "source": [
+        "from azureml.core import Workspace\r\n",
+        "from azureml.core import Dataset\r\n",
+        "\r\n",
+        "ws = Workspace.from_config()\r\n",
+        "name='BTC-Bitstamp-raw'\r\n",
+        "dataset = Dataset.get_by_name(ws, name=name)\r\n",
+        "df = dataset.to_pandas_dataframe()\r\n",
+        "df"
+      ],
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "execution_count": 74,
+          "data": {
+            "text/plain": "          Timestamp      Open      High       Low     Close  Volume_(BTC)  \\\n0        1325317920      4.39      4.39      4.39      4.39      0.455581   \n1        1325317980       NaN       NaN       NaN       NaN           NaN   \n2        1325318040       NaN       NaN       NaN       NaN           NaN   \n3        1325318100       NaN       NaN       NaN       NaN           NaN   \n4        1325318160       NaN       NaN       NaN       NaN           NaN   \n...             ...       ...       ...       ...       ...           ...   \n4857372  1617148560  58714.31  58714.31  58686.00  58686.00      1.384487   \n4857373  1617148620  58683.97  58693.43  58683.97  58685.81      7.294848   \n4857374  1617148680  58693.43  58723.84  58693.43  58723.84      1.705682   \n4857375  1617148740  58742.18  58770.38  58742.18  58760.59      0.720415   \n4857376  1617148800  58767.75  58778.18  58755.97  58778.18      2.712831   \n\n         Volume_(Currency)  Weighted_Price  \n0                 2.000000        4.390000  \n1                      NaN             NaN  \n2                      NaN             NaN  \n3                      NaN             NaN  \n4                      NaN             NaN  \n...                    ...             ...  \n4857372       81259.372187    58692.753339  \n4857373      428158.146640    58693.226508  \n4857374      100117.070370    58696.198496  \n4857375       42332.958633    58761.866202  \n4857376      159417.751000    58764.349363  \n\n[4857377 rows x 8 columns]",
+            "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Timestamp</th>\n      <th>Open</th>\n      <th>High</th>\n      <th>Low</th>\n      <th>Close</th>\n      <th>Volume_(BTC)</th>\n      <th>Volume_(Currency)</th>\n      <th>Weighted_Price</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>1325317920</td>\n      <td>4.39</td>\n      <td>4.39</td>\n      <td>4.39</td>\n      <td>4.39</td>\n      <td>0.455581</td>\n      <td>2.000000</td>\n      <td>4.390000</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>1325317980</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>1325318040</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>1325318100</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>1325318160</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>4857372</th>\n      <td>1617148560</td>\n      <td>58714.31</td>\n      <td>58714.31</td>\n      <td>58686.00</td>\n      <td>58686.00</td>\n      <td>1.384487</td>\n      <td>81259.372187</td>\n      <td>58692.753339</td>\n    </tr>\n    <tr>\n      <th>4857373</th>\n      <td>1617148620</td>\n      <td>58683.97</td>\n      <td>58693.43</td>\n      <td>58683.97</td>\n      <td>58685.81</td>\n      <td>7.294848</td>\n      <td>428158.146640</td>\n      <td>58693.226508</td>\n    </tr>\n    <tr>\n      <th>4857374</th>\n      <td>1617148680</td>\n      <td>58693.43</td>\n      <td>58723.84</td>\n      <td>58693.43</td>\n      <td>58723.84</td>\n      <td>1.705682</td>\n      <td>100117.070370</td>\n      <td>58696.198496</td>\n    </tr>\n    <tr>\n      <th>4857375</th>\n      <td>1617148740</td>\n      <td>58742.18</td>\n      <td>58770.38</td>\n      <td>58742.18</td>\n      <td>58760.59</td>\n      <td>0.720415</td>\n      <td>42332.958633</td>\n      <td>58761.866202</td>\n    </tr>\n    <tr>\n      <th>4857376</th>\n      <td>1617148800</td>\n      <td>58767.75</td>\n      <td>58778.18</td>\n      <td>58755.97</td>\n      <td>58778.18</td>\n      <td>2.712831</td>\n      <td>159417.751000</td>\n      <td>58764.349363</td>\n    </tr>\n  </tbody>\n</table>\n<p>4857377 rows × 8 columns</p>\n</div>"
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 74,
+      "metadata": {
+        "gather": {
+          "logged": 1645559608489
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = df.drop([2349652,38526,45313,672665])\r\n",
+        "df = df.dropna()"
+      ],
+      "outputs": [],
+      "execution_count": 75,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1645559615739
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import numpy as np\r\n",
+        "ts = df['Close']\r\n",
+        "df['x']=(ts/ts.shift(1))"
+      ],
+      "outputs": [],
+      "execution_count": 76,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1645559622269
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df[df['x']>1.2]\r\n",
+        "#df['x'].plot()\r\n"
+      ],
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "execution_count": 80,
+          "data": {
+            "text/plain": "         Timestamp    Open   High     Low  Close  Volume_(BTC)  \\\n27479   1326966660    7.00    7.0    7.00    7.0      4.520000   \n671690  1365619320  120.15  170.0  120.15  170.0     35.424541   \n\n        Volume_(Currency)  Weighted_Price         x  \n27479           31.640000        7.000000  1.268116  \n671690        4721.055357      133.270757  1.545455  ",
+            "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Timestamp</th>\n      <th>Open</th>\n      <th>High</th>\n      <th>Low</th>\n      <th>Close</th>\n      <th>Volume_(BTC)</th>\n      <th>Volume_(Currency)</th>\n      <th>Weighted_Price</th>\n      <th>x</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>27479</th>\n      <td>1326966660</td>\n      <td>7.00</td>\n      <td>7.0</td>\n      <td>7.00</td>\n      <td>7.0</td>\n      <td>4.520000</td>\n      <td>31.640000</td>\n      <td>7.000000</td>\n      <td>1.268116</td>\n    </tr>\n    <tr>\n      <th>671690</th>\n      <td>1365619320</td>\n      <td>120.15</td>\n      <td>170.0</td>\n      <td>120.15</td>\n      <td>170.0</td>\n      <td>35.424541</td>\n      <td>4721.055357</td>\n      <td>133.270757</td>\n      <td>1.545455</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 80,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1645559661193
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df[(df['Timestamp'] >= 1326800660) &(  df['Timestamp'] <= 1326966660)]\r\n"
+      ],
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "execution_count": 89,
+          "data": {
+            "text/plain": "        Timestamp  Open  High   Low  Close  Volume_(BTC)  Volume_(Currency)  \\\n24733  1326801900  6.50  6.50  6.50   6.50      1.000000           6.500000   \n24734  1326801960  6.50  6.50  6.50   6.50      1.000000           6.500000   \n24864  1326809760  6.90  6.90  6.90   6.90      2.000000          13.800000   \n24912  1326812640  6.90  6.90  6.90   6.90      7.246377          50.000000   \n25361  1326839580  6.40  6.40  6.40   6.40      1.000000           6.400000   \n...           ...   ...   ...   ...    ...           ...                ...   \n26254  1326893160  6.00  6.00  6.00   6.00     12.000000          72.000000   \n26328  1326897600  6.00  6.00  6.00   6.00      3.423623          20.541739   \n26336  1326898080  7.10  7.10  7.10   7.10      2.000000          14.200000   \n27260  1326953520  5.52  5.52  5.52   5.52      2.000000          11.040000   \n27479  1326966660  7.00  7.00  7.00   7.00      4.520000          31.640000   \n\n       Weighted_Price         x  \n24733            6.50  0.915493  \n24734            6.50  1.000000  \n24864            6.90  1.061538  \n24912            6.90  1.000000  \n25361            6.40  0.927536  \n...               ...       ...  \n26254            6.00  0.923077  \n26328            6.00  1.000000  \n26336            7.10  1.183333  \n27260            5.52  0.777465  \n27479            7.00  1.268116  \n\n[62 rows x 9 columns]",
+            "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Timestamp</th>\n      <th>Open</th>\n      <th>High</th>\n      <th>Low</th>\n      <th>Close</th>\n      <th>Volume_(BTC)</th>\n      <th>Volume_(Currency)</th>\n      <th>Weighted_Price</th>\n      <th>x</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>24733</th>\n      <td>1326801900</td>\n      <td>6.50</td>\n      <td>6.50</td>\n      <td>6.50</td>\n      <td>6.50</td>\n      <td>1.000000</td>\n      <td>6.500000</td>\n      <td>6.50</td>\n      <td>0.915493</td>\n    </tr>\n    <tr>\n      <th>24734</th>\n      <td>1326801960</td>\n      <td>6.50</td>\n      <td>6.50</td>\n      <td>6.50</td>\n      <td>6.50</td>\n      <td>1.000000</td>\n      <td>6.500000</td>\n      <td>6.50</td>\n      <td>1.000000</td>\n    </tr>\n    <tr>\n      <th>24864</th>\n      <td>1326809760</td>\n      <td>6.90</td>\n      <td>6.90</td>\n      <td>6.90</td>\n      <td>6.90</td>\n      <td>2.000000</td>\n      <td>13.800000</td>\n      <td>6.90</td>\n      <td>1.061538</td>\n    </tr>\n    <tr>\n      <th>24912</th>\n      <td>1326812640</td>\n      <td>6.90</td>\n      <td>6.90</td>\n      <td>6.90</td>\n      <td>6.90</td>\n      <td>7.246377</td>\n      <td>50.000000</td>\n      <td>6.90</td>\n      <td>1.000000</td>\n    </tr>\n    <tr>\n      <th>25361</th>\n      <td>1326839580</td>\n      <td>6.40</td>\n      <td>6.40</td>\n      <td>6.40</td>\n      <td>6.40</td>\n      <td>1.000000</td>\n      <td>6.400000</td>\n      <td>6.40</td>\n      <td>0.927536</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>26254</th>\n      <td>1326893160</td>\n      <td>6.00</td>\n      <td>6.00</td>\n      <td>6.00</td>\n      <td>6.00</td>\n      <td>12.000000</td>\n      <td>72.000000</td>\n      <td>6.00</td>\n      <td>0.923077</td>\n    </tr>\n    <tr>\n      <th>26328</th>\n      <td>1326897600</td>\n      <td>6.00</td>\n      <td>6.00</td>\n      <td>6.00</td>\n      <td>6.00</td>\n      <td>3.423623</td>\n      <td>20.541739</td>\n      <td>6.00</td>\n      <td>1.000000</td>\n    </tr>\n    <tr>\n      <th>26336</th>\n      <td>1326898080</td>\n      <td>7.10</td>\n      <td>7.10</td>\n      <td>7.10</td>\n      <td>7.10</td>\n      <td>2.000000</td>\n      <td>14.200000</td>\n      <td>7.10</td>\n      <td>1.183333</td>\n    </tr>\n    <tr>\n      <th>27260</th>\n      <td>1326953520</td>\n      <td>5.52</td>\n      <td>5.52</td>\n      <td>5.52</td>\n      <td>5.52</td>\n      <td>2.000000</td>\n      <td>11.040000</td>\n      <td>5.52</td>\n      <td>0.777465</td>\n    </tr>\n    <tr>\n      <th>27479</th>\n      <td>1326966660</td>\n      <td>7.00</td>\n      <td>7.00</td>\n      <td>7.00</td>\n      <td>7.00</td>\n      <td>4.520000</td>\n      <td>31.640000</td>\n      <td>7.00</td>\n      <td>1.268116</td>\n    </tr>\n  </tbody>\n</table>\n<p>62 rows × 9 columns</p>\n</div>"
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 89,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1645559802220
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3-azureml",
+      "language": "python",
+      "display_name": "Python 3.6 - AzureML"
+    },
+    "language_info": {
+      "name": "python",
+      "version": "3.6.9",
+      "mimetype": "text/x-python",
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "pygments_lexer": "ipython3",
+      "nbconvert_exporter": "python",
+      "file_extension": ".py"
+    },
+    "kernel_info": {
+      "name": "python3-azureml"
+    },
+    "nteract": {
+      "version": "nteract-front-end@1.0.0"
+    },
+    "microsoft": {
+      "host": {
+        "AzureML": {
+          "notebookHasBeenCompleted": true
+        }
+      }
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 2
+}
